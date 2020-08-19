@@ -1,11 +1,13 @@
 window.addEventListener("DOMContentLoaded", () => {
   const itemForm = window.document.forms["item-form"]
   const records_panel = window.document.querySelector("#records-panel")
-  // let records = []
+  let records = []
 
   item_form_listener()
   record_delete_listener()
+  search_record_listener()
   get_records()
+  show_records(records)
   
 
   //listener
@@ -16,11 +18,10 @@ window.addEventListener("DOMContentLoaded", () => {
       //records 陣列加入新紀錄
       records.push(new_record())
       save_records(records)
+      //顯示所有紀錄
       show_records(records)
       // console.log(records)
       itemForm.reset()
-      //顯示所有紀錄
-      show_records(records)
     })
   }
 
@@ -119,4 +120,25 @@ window.addEventListener("DOMContentLoaded", () => {
     });
     return uuid;
   };
+
+  //search 
+  function search_record_listener() {
+    const search_form = window.document.forms["search-form"]
+
+    search_form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      let select_category = search_form.elements.category.value
+      let select_month = search_form.elements.month.value
+      let filter_records = get_records()
+
+      if (select_category) {
+        filter_records = filter_records.filter((r) => r.category === select_category)
+      }
+      if (select_month) {
+        filter_records = filter_records.filter((r) => r.date.match(/\d{4}\-\d{2}/)[0] === select_month)
+      }
+      // console.log(filter_records)
+      show_records(filter_records)
+    })
+  }
 })

@@ -1,22 +1,40 @@
 window.addEventListener("DOMContentLoaded", () => {
   const itemForm = window.document.forms["item-form"]
   const records_panel = window.document.querySelector("#records-panel")
-  let records = []
+  // let records = []
 
   item_form_listener()
+  record_delete_listener()
   get_records()
-  show_records(records)
+  
 
+  //listener
   function item_form_listener() {
     itemForm.addEventListener("submit", (e) => {
       e.preventDefault();
-
+      records = get_records() || []
       //records 陣列加入新紀錄
       records.push(new_record())
       save_records(records)
       show_records(records)
       // console.log(records)
       itemForm.reset()
+      //顯示所有紀錄
+      show_records(records)
+    })
+  }
+
+  function record_delete_listener() {
+    records_panel.addEventListener("click", ({target}) => {
+      if (target.className === "remove") {
+        let target_record = target.parentNode.parentNode
+        let records = get_records()
+        // 排除目標 uuid record
+        records = records.filter((r) => r.uuid !== target_record.dataset.uuid )
+        // 移除 target record
+        save_records(records)
+        target_record.remove()
+      }
     })
   }
   
@@ -48,12 +66,10 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-
   function show_records(records) {
     console.log(records)
     //移除原本內容
     while (records_panel.hasChildNodes()) {
-      console.log("aaaa")
       records_panel.removeChild(records_panel.childNodes[0]);
     }
     //排序records
@@ -68,6 +84,9 @@ window.addEventListener("DOMContentLoaded", () => {
     let t = window.document.querySelector("#record-template")
     var clone = document.importNode(t.content, true);
 
+    // console.log(clone.dataset.uuid)
+    
+    clone.querySelector("tr").setAttribute('data-uuid', record.uuid)
     clone.querySelector(".category").textContent = record.category
     clone.querySelector(".date").textContent = record.date
     clone.querySelector(".amount").textContent = record.amount
